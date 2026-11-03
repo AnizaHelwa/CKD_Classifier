@@ -1,158 +1,98 @@
 """
-CKD - Baseline : membandingkan varian SVM (SVC, NuSVC, LinearSVC) x semua kernel yang
-relevan, ditambah model pembanding (Logistic Regression, Random Forest, Dummy).
-Semua konfigurasi di-tuning via nested CV dan di-log ke MLflow sebagai satu run per
-konfigurasi (bukan per fold).
+Baseline v2: semua kandidat (SVC/NuSVC/LinearSVC x kernel + pembanding) dengan protokol yang
+sama, hanya memakai DATA LATIH, dicatat ke MLflow (1 run per kandidat).
 
-Jalankan dari root folder proyek:
-    python experiments/run_baseline.py                  (penuh)
-    python experiments/run_baseline.py --quick            (uji cepat)
+Jalankan dari root proyek:
+    python -m experiments.run_baseline --quick      # uji cepat (bukan untuk kesimpulan)
+    python -m experiments.run_baseline              # penuh
+    python -m experiments.run_baseline --only svc_poly,nusvc_poly
+Lalu:
+    python -m experiments.select_baseline_winner
 """
 import argparse
+import json
 import os
-import sys
 import tempfile
 import warnings
 
 import mlflow
 import numpy as np
 import pandas as pd
-from sklearn.dummy import DummyClassifier
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.linear_model import LogisticRegression
-from sklearn.model_selection import GridSearchCV, cross_validate
-from sklearn.pipeline import Pipeline as SkPipeline
-from sklearn.preprocessing import StandardScaler
-from sklearn.compose import ColumnTransformer
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
-from src.pipeline import (CAT, SCORING, PRIMARY_METRIC, SEED, build_pipeline,
-                          kernel_grid, nested_eval, cv_objects, _cont_cols)
+from src.baseline import build_candidates, evaluate_candidate
+from src.data import CV_SEED, SPLIT_SEED, file_sha256, load_train
+from src.metrics import PRIMARY, SCORING
 
 warnings.filterwarnings("ignore")
-
-EXPERIMENT_NAME = "CKD_SVM_Baseline"
-
-# Kombinasi (svm_type, kernel) yang diuji di baseline.
-SVM_CONFIGS = [
-    ("linearsvc", "linear"),
-    ("svc", "linear"), ("svc", "poly"), ("svc", "rbf"), ("svc", "sigmoid"),
-    ("nusvc", "linear"), ("nusvc", "poly"), ("nusvc", "rbf"), ("nusvc", "sigmoid"),
-]
+EXPERIMENT = "CKD_Baseline_v2"
 
 
-def log_run(run_name, params, row, extra_tags=None):
-    """Log satu konfigurasi (ringkasan CV) sebagai satu MLflow run."""
-    with mlflow.start_run(run_name=run_name):
-        mlflow.log_params(params)
-        if extra_tags:
-            mlflow.set_tags(extra_tags)
-        for m in SCORING:
-            mlflow.log_metric(f"{m}_mean", row[f"_{m}_mean"])
-            mlflow.log_metric(f"{m}_std", row[f"_{m}_std"])
-        # simpan daftar best_params per fold sebagai artifact teks, untuk audit
-        if "_best_params_per_fold" in row:
-            # pakai tempfile, bukan path hardcoded "/tmp/...", supaya jalan di Windows/Mac/Linux
-            with tempfile.NamedTemporaryFile(
-                mode="w", suffix=".txt", delete=False, encoding="utf-8"
-            ) as f:
-                f.write(str(row["_best_params_per_fold"]))
-                tmp_path = f.name
-            mlflow.log_artifact(tmp_path, artifact_path="best_params")
-            os.remove(tmp_path)
-        print(f"  -> {run_name}: {PRIMARY_METRIC}={row[f'_{PRIMARY_METRIC}_mean']:.3f} "
-              f"± {row[f'_{PRIMARY_METRIC}_std']:.3f}")
-
-
-def run_svm_baseline(X, y, quick):
-    for svm_type, kernel in SVM_CONFIGS:
-        label = f"{svm_type}_{kernel}"
-        pipe = build_pipeline(X, svm_type=svm_type, kernel=kernel)
-        grid = kernel_grid(svm_type, kernel)
-        row = nested_eval(label, pipe, grid, X, y, quick=quick)
-        log_run(
-            run_name=label,
-            params={"model_family": "SVM", "svm_type": svm_type, "kernel": kernel,
-                    "resample": "smote", "feature_engineering": False,
-                    "feature_selection": "none"},
-            row=row,
-            extra_tags={"stage": "baseline"},
-        )
-
-
-def _simple_pipeline(estimator):
-    """Pipeline sederhana (scaling saja, tanpa SMOTE/FS/FE) untuk model pembanding."""
-    cat = CAT
-    return SkPipeline([
-        ("prep", ColumnTransformer(
-            [("num", StandardScaler(), _cont_cols), ("cat", "passthrough", cat)])),
-        ("clf", estimator),
-    ])
-
-
-def run_comparison_models(X, y, quick):
-    _, outer = cv_objects(quick)
-
-    comparisons = {
-        "dummy_most_frequent": (DummyClassifier(strategy="most_frequent"), {}),
-        "logistic_regression": (
-            LogisticRegression(max_iter=3000, class_weight="balanced", random_state=SEED),
-            {"clf__C": np.logspace(-2, 2, 3 if quick else 5)},
-        ),
-        "random_forest": (
-            RandomForestClassifier(class_weight="balanced", random_state=SEED, n_jobs=-1),
-            {"clf__n_estimators": [200] if quick else [100, 200, 400],
-             "clf__max_depth": [None, 10, 20]},
-        ),
-    }
-
-    for label, (estimator, grid) in comparisons.items():
-        pipe = _simple_pipeline(estimator)
-        if grid:
-            inner, _ = cv_objects(quick)
-            model = GridSearchCV(pipe, grid, scoring=PRIMARY_METRIC, cv=inner, n_jobs=-1)
-        else:
-            model = pipe
-        res = cross_validate(model, X, y, cv=outer, scoring=SCORING, n_jobs=1)
-        row = {"config": label}
-        for m in SCORING:
-            s = res[f"test_{m}"]
-            row[f"_{m}_mean"] = s.mean()
-            row[f"_{m}_std"] = s.std()
-        log_run(
-            run_name=label,
-            params={"model_family": "comparison", "svm_type": "-", "kernel": "-",
-                    "resample": "-", "feature_engineering": False,
-                    "feature_selection": "none"},
-            row=row,
-            extra_tags={"stage": "baseline_comparison"},
-        )
+def already_done(name, mode):
+    runs = mlflow.search_runs(
+        experiment_names=[EXPERIMENT], output_format="pandas",
+        filter_string=f"tags.mode = '{mode}' and tags.mlflow.runName = '{name}' "
+                      f"and attributes.status = 'FINISHED'")
+    return len(runs) > 0
 
 
 def main():
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--data", default="data/CKD.csv")
-    parser.add_argument("--quick", action="store_true")
-    args = parser.parse_args()
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--data", default="data/CKD.csv")
+    ap.add_argument("--quick", action="store_true")
+    ap.add_argument("--only", default="", help="daftar nama kandidat dipisah koma")
+    ap.add_argument("--force", action="store_true", help="jalankan ulang walau sudah ada hasilnya")
+    args = ap.parse_args()
+    mode = "quick" if args.quick else "full"
 
-    # MLflow >= 3.x: backend file (./mlruns) sudah di-deprecate, pakai SQLite lokal.
     mlflow.set_tracking_uri("sqlite:///mlflow.db")
-    mlflow.set_experiment(EXPERIMENT_NAME)
+    mlflow.set_experiment(EXPERIMENT)
 
-    df = pd.read_csv(args.data, sep=";").drop(
-        columns=["PatientID", "DoctorInCharge"], errors="ignore")
-    X, y = df.drop(columns="Diagnosis"), df["Diagnosis"]
+    X, y = load_train(args.data)          # hanya data latih; test set tidak dibuka
+    sha = file_sha256(args.data)[:12]
+    print(f"Mode={mode} | data latih={X.shape} | non-CKD(0)={np.mean(y == 0):.3f} CKD(1)={np.mean(y == 1):.3f}")
+    print(f"Metrik pemilihan (PRIMARY) = {PRIMARY}\n")
 
-    print(f"Data: {X.shape}, kelas: {y.value_counts(normalize=True).to_dict()}")
-    print(f"Mode: {'QUICK' if args.quick else 'PENUH'}\n")
+    cands = build_candidates(y, quick=args.quick)
+    if args.only:
+        cands = {k: v for k, v in cands.items() if k in args.only.split(",")}
 
-    print("== Baseline model pembanding (Dummy, Logistic Regression, Random Forest) ==")
-    run_comparison_models(X, y, args.quick)
+    for name, spec in cands.items():
+        if not args.force and already_done(name, mode):
+            print(f"[skip] {name} (sudah ada di MLflow, pakai --force untuk mengulang)")
+            continue
+        print(f"[run ] {name} ...", flush=True)
+        fold_scores, best_params = evaluate_candidate(spec, X, y, quick=args.quick)
+        n_failed = int(np.isnan(fold_scores[PRIMARY]).sum())
 
-    print("\n== Baseline SVM (SVC/NuSVC/LinearSVC x semua kernel) ==")
-    run_svm_baseline(X, y, args.quick)
+        with mlflow.start_run(run_name=name):
+            mlflow.set_tags({"stage": "baseline", "mode": mode, "protocol": "v2",
+                             "family": spec["family"]})
+            mlflow.log_params({
+                "svm_type": spec["svm_type"], "kernel": spec["kernel"],
+                "preprocessing": "StandardScaler(kontinu)+passthrough(kategorikal)",
+                "imbalance_handling": "none", "feature_selection": "none",
+                "feature_engineering": False, "tuning_metric": PRIMARY,
+                "inner_cv": "StratifiedKFold(3)",
+                "outer_cv": "RepeatedStratifiedKFold(3x1)" if args.quick else "RepeatedStratifiedKFold(5x3)",
+                "cv_seed": CV_SEED, "split_seed": SPLIT_SEED, "n_train": len(X),
+                "minority_frac": round(float(np.mean(y == 0)), 4), "data_sha256": sha,
+                "grid": json.dumps(spec["grid"], default=str)[:500],
+            })
+            mlflow.log_metric("n_failed_folds", n_failed)
+            for m, s in fold_scores.items():
+                mlflow.log_metric(f"{m}_mean", float(np.nanmean(s)))
+                mlflow.log_metric(f"{m}_std", float(np.nanstd(s)))
+                mlflow.log_metric(f"{m}_se", float(np.nanstd(s) / np.sqrt(np.sum(~np.isnan(s)))))
+            with tempfile.TemporaryDirectory() as d:
+                pd.DataFrame(fold_scores).to_csv(os.path.join(d, "fold_scores.csv"), index_label="fold")
+                with open(os.path.join(d, "best_params_per_fold.json"), "w", encoding="utf-8") as f:
+                    json.dump(best_params, f, default=str)
+                mlflow.log_artifacts(d)
+        print(f"        {PRIMARY} = {np.nanmean(fold_scores[PRIMARY]):.3f} ± {np.nanstd(fold_scores[PRIMARY]):.3f}"
+              f"   (fold gagal: {n_failed})")
 
-    print("\nSelesai. Jalankan 'mlflow ui' lalu buka http://localhost:5000 untuk melihat hasil.")
+    print("\nSelesai. Berikutnya: python -m experiments.select_baseline_winner"
+          + (" --mode quick" if args.quick else ""))
 
 
 if __name__ == "__main__":
