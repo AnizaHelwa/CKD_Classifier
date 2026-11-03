@@ -1,0 +1,75 @@
+{
+  "protocol": "v2",
+  "mode": "full",
+  "primary_metric": "mcc",
+  "winner": {
+    "name": "linearsvc_linear",
+    "svm_type": "linearsvc",
+    "kernel": "linear",
+    "metrics": {
+      "mcc": 0.19965546429945358,
+      "balanced_acc": 0.542069581231694,
+      "f1_macro": 0.5535916712056766,
+      "sensitivity": 0.9945287728529988,
+      "specificity": 0.08961038961038961,
+      "roc_auc": 0.7985135493484006,
+      "pr_auc_nonckd": 0.3579681059196897
+    },
+    "modal_best_params": {
+      "clf__C": 0.1
+    },
+    "modal_params_frequency": "7/15 fold"
+  },
+  "within_1se": [
+    "linearsvc_linear",
+    "nusvc_poly",
+    "svc_sigmoid",
+    "svc_rbf",
+    "nusvc_rbf",
+    "nusvc_sigmoid"
+  ],
+  "beats_dummy": true,
+  "ranking_svm": [
+    {
+      "name": "linearsvc_linear",
+      "mcc": 0.1997
+    },
+    {
+      "name": "nusvc_poly",
+      "mcc": 0.1908
+    },
+    {
+      "name": "svc_sigmoid",
+      "mcc": 0.1853
+    },
+    {
+      "name": "svc_rbf",
+      "mcc": 0.1846
+    },
+    {
+      "name": "nusvc_rbf",
+      "mcc": 0.1802
+    },
+    {
+      "name": "nusvc_sigmoid",
+      "mcc": 0.1799
+    },
+    {
+      "name": "svc_poly",
+      "mcc": 0.1736
+    },
+    {
+      "name": "nusvc_linear",
+      "mcc": 0.1573
+    },
+    {
+      "name": "svc_linear",
+      "mcc": 0.014
+    }
+  ],
+  "context": {
+    "logistic_regression": 0.243,
+    "random_forest": 0.0552,
+    "dummy_most_frequent": 0.0
+  }
+}
