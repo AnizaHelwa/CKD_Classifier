@@ -1,5 +1,8 @@
+@"
 venv/
 mlruns/
+mlflow.db
 __pycache__/
 *.pyc
 .ipynb_checkpoints/
+"@ | Out-File -FilePath .gitignore -Encoding utf8
