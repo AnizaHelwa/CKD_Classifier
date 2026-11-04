@@ -1,0 +1,69 @@
+{
+  "model": "linearsvc_linear",
+  "cfg": {
+    "scaler": "standard",
+    "encoding": "ordinal",
+    "resample": "none",
+    "threshold": true,
+    "fe": true,
+    "fs": [
+      "anova",
+      30
+    ]
+  },
+  "best_params": {
+    "estimator__clf__C": 0.1,
+    "estimator__clf__loss": "squared_hinge",
+    "estimator__clf__penalty": "l2"
+  },
+  "test_metrics": {
+    "mcc": 0.39526411657559196,
+    "balanced_acc": 0.697632058287796,
+    "f1_macro": 0.697632058287796,
+    "sensitivity": 0.9508196721311475,
+    "specificity": 0.4444444444444444,
+    "roc_auc": 0.8536733454766242,
+    "pr_auc_nonckd": 0.45927288253446413
+  },
+  "test_ci95": {
+    "mcc": [
+      0.21481333292580213,
+      0.5565270188221008
+    ],
+    "balanced_acc": [
+      0.6022343655130541,
+      0.7902246508803885
+    ],
+    "f1_macro": [
+      0.6070754566100502,
+      0.7782635094110504
+    ],
+    "sensitivity": [
+      0.9245901639344263,
+      0.9737704918032787
+    ],
+    "specificity": [
+      0.25925925925925924,
+      0.6296296296296297
+    ],
+    "roc_auc": [
+      0.7792076502732241,
+      0.9152459016393442
+    ],
+    "pr_auc_nonckd": [
+      0.30005637071135566,
+      0.6305878175363145
+    ]
+  },
+  "confusion_matrix": [
+    [
+      12,
+      15
+    ],
+    [
+      15,
+      290
+    ]
+  ],
+  "cv_mcc_mean": 0.3457259019714412
+}
