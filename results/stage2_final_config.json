@@ -1,0 +1,81 @@
+{
+  "mode": "full",
+  "winner_model": "linearsvc_linear",
+  "final": "combined",
+  "final_cfg": {
+    "scaler": "standard",
+    "encoding": "ordinal",
+    "resample": "none",
+    "threshold": true,
+    "fe": true,
+    "fs": [
+      "anova",
+      30
+    ]
+  },
+  "comparison": {
+    "baseline": {
+      "mcc": 0.19965546429945358,
+      "cfg": {
+        "scaler": "standard",
+        "encoding": "ordinal",
+        "resample": "none",
+        "threshold": false,
+        "fe": false,
+        "fs": null
+      }
+    },
+    "best_single": {
+      "mcc": 0.3019514447772476,
+      "cfg": {
+        "scaler": "standard",
+        "encoding": "ordinal",
+        "resample": "none",
+        "threshold": true,
+        "fe": false,
+        "fs": null
+      },
+      "mean_diff_vs_baseline": 0.1022959804777941,
+      "t": 1.6353388836466065,
+      "p": 0.1242540440682809,
+      "sensitivity": 0.9089219456250422,
+      "specificity": 0.437950937950938
+    },
+    "combined": {
+      "mcc": 0.35380247686262645,
+      "cfg": {
+        "scaler": "standard",
+        "encoding": "ordinal",
+        "resample": "none",
+        "threshold": true,
+        "fe": true,
+        "fs": [
+          "anova",
+          30
+        ]
+      },
+      "mean_diff_vs_baseline": 0.1541470125631729,
+      "t": 2.423071956038965,
+      "p": 0.029533174977692145,
+      "sensitivity": 0.9523949268029414,
+      "specificity": 0.37128427128427127
+    }
+  },
+  "loo_ablation": {
+    "imbalance": {
+      "mcc_without": 0.26210059533493396,
+      "delta_vs_combined": -0.09170188152769251,
+      "p": 0.1361302667583037
+    },
+    "feature_engineering": {
+      "mcc_without": 0.31170738597762504,
+      "delta_vs_combined": -0.04209509088500143,
+      "p": 0.23521454498239916
+    },
+    "feature_selection": {
+      "mcc_without": 0.34353909277994127,
+      "delta_vs_combined": -0.010263384082685218,
+      "p": 0.8609895319191258
+    }
+  }
+}

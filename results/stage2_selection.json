@@ -1,0 +1,82 @@
+{
+  "mode": "full",
+  "primary_metric": "mcc",
+  "reference_mcc": 0.19965546429945358,
+  "chosen_per_group": {
+    "scaler": {
+      "level": "baseline",
+      "top1_level": "yeojohnson",
+      "top1_mcc": 0.2157484821184614
+    },
+    "encoding": {
+      "level": "baseline",
+      "top1_level": "baseline",
+      "top1_mcc": 0.19965546429945358
+    },
+    "imbalance": {
+      "level": "none+threshold",
+      "top1_level": "none+threshold",
+      "top1_mcc": 0.3019514447772476,
+      "cfg": {
+        "scaler": "standard",
+        "encoding": "ordinal",
+        "resample": "none",
+        "threshold": true,
+        "fe": false,
+        "fs": null
+      }
+    },
+    "feature_engineering": {
+      "level": "fe",
+      "top1_level": "fe",
+      "top1_mcc": 0.2915928884818738,
+      "cfg": {
+        "scaler": "standard",
+        "encoding": "ordinal",
+        "resample": "none",
+        "threshold": false,
+        "fe": true,
+        "fs": null
+      }
+    },
+    "feature_selection": {
+      "level": "anova_k30",
+      "top1_level": "anova_k30",
+      "top1_mcc": 0.22895285371004107,
+      "cfg": {
+        "scaler": "standard",
+        "encoding": "ordinal",
+        "resample": "none",
+        "threshold": false,
+        "fe": false,
+        "fs": [
+          "anova",
+          30
+        ]
+      }
+    }
+  },
+  "combined_cfg": {
+    "scaler": "standard",
+    "encoding": "ordinal",
+    "resample": "none",
+    "threshold": true,
+    "fe": true,
+    "fs": [
+      "anova",
+      30
+    ]
+  },
+  "best_single": {
+    "group": "imbalance",
+    "mcc": 0.3019514447772476,
+    "cfg": {
+      "scaler": "standard",
+      "encoding": "ordinal",
+      "resample": "none",
+      "threshold": true,
+      "fe": false,
+      "fs": null
+    }
+  }
+}
