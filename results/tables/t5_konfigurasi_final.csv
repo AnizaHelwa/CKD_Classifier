@@ -1,0 +1,12 @@
+﻿Item;Nilai
+Komponen: scaler;standard
+Komponen: encoding;ordinal
+Komponen: resample;none
+Komponen: threshold;ya
+Komponen: fe;ya
+Komponen: fs;anova 30
+Hiperparameter: C;0,1
+Hiperparameter: loss;squared_hinge
+Hiperparameter: penalty;l2
+Threshold keputusan (hasil tuning);0,3731
+Iterasi solver (n_iter_ / max_iter);7 / 20000

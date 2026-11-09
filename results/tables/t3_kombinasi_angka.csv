@@ -1,0 +1,5 @@
+﻿Konfigurasi;MCC mean;MCC SD;MCC SE;Selisih vs baseline;p terkoreksi;Sensitivity;Specificity;Komponen
+Baseline;0.19965546429945358;0.09475703109059676;0.02446616022332931;0.0;;0.9945287728529988;0.08961038961038961;"scaler=standard; encoding=ordinal; resample=none; threshold=tidak; fe=tidak; fs=tidak ada"
+Komponen tunggal terbaik;0.3019514447772476;0.05459190969031179;0.01409557047121579;0.10229598047779404;0.1242540440682809;0.9089219456250422;0.437950937950938;"scaler=standard; encoding=ordinal; resample=none; threshold=ya; fe=tidak; fs=tidak ada"
+Gabungan;0.35380247686262645;0.05448501693513059;0.014067970880505988;0.15414701256317287;0.029533174977692145;0.9523949268029414;0.37128427128427127;"scaler=standard; encoding=ordinal; resample=none; threshold=ya; fe=ya; fs=anova 30"
+Final (tuning akhir, CV);0.3457259019714412;0.043328430315417124;0.01118735260192794;0.14607043767198763;;0.9390136949335492;0.4077922077922078;"scaler=standard; encoding=ordinal; resample=none; threshold=ya; fe=ya; fs=anova 30"

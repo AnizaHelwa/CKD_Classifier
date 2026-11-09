@@ -1,0 +1,27 @@
+﻿Item;Nilai
+Tanggal ekspor;2026-11-09 13:34
+Mode;full
+Git commit;eaa15f9
+Git branch;main
+Git tag terdekat;v2-final-1-geaa15f9
+Python;3.13.1
+Platform;Windows-11-10.0.26200-SP0
+scikit-learn;1.9.1
+imbalanced-learn;0.14.2
+numpy;2.5.4
+pandas;3.1.0
+scipy;1.18.1
+mlflow;3.17.2
+matplotlib;3.11.2
+Protokol baseline: data_sha256;cf9da5020a0f
+Protokol baseline: split_seed;2026
+Protokol baseline: cv_seed;42
+Protokol baseline: n_train;1327
+Protokol baseline: minority_frac;0.0814
+Protokol baseline: preprocessing;StandardScaler(kontinu)+passthrough(kategorikal)
+Protokol baseline: imbalance_handling;none
+Protokol baseline: inner_cv;StratifiedKFold(3)
+Protokol baseline: outer_cv;RepeatedStratifiedKFold(5x3)
+Protokol baseline: tuning_metric;mcc
+Pemenang baseline;linearsvc_linear
+Metrik utama;mcc

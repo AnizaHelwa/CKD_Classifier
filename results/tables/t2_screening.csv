@@ -1,0 +1,27 @@
+﻿Kelompok;Level;MCC (rata-rata ± SD);SE;Selisih vs baseline;Sensitivity;Specificity;Jumlah fitur akhir;Fold tidak konvergen;Setara (≤1 SE) dengan terbaik di kelompok;Dipilih
+Acuan;baseline;0,200 ± 0,095;0,024;0,000;0,995;0,090;51,0;;;
+Normalisasi;yeojohnson;0,216 ± 0,086;0,022;0,016;0,995;0,093;51,0;;ya;
+Normalisasi;minmax;0,196 ± 0,092;0,024;-0,004;0,995;0,087;51,0;;ya;
+Normalisasi;robust;0,186 ± 0,107;0,028;-0,014;0,995;0,087;51,0;;;
+Normalisasi;none;0,158 ± 0,103;0,027;-0,042;0,995;0,068;51,0;;;
+Encoding kategorikal;onehot_nominal;0,185 ± 0,107;0,028;-0,014;0,995;0,087;54,0;;ya;
+Penanganan imbalance;none+threshold;0,302 ± 0,055;0,014;0,102;0,909;0,438;51,0;;ya;ya
+Penanganan imbalance;class_weight;0,287 ± 0,049;0,013;0,087;0,773;0,688;51,0;;;
+Penanganan imbalance;class_weight+threshold;0,271 ± 0,094;0,024;0,072;0,876;0,456;51,0;;;
+Penanganan imbalance;smote;0,207 ± 0,062;0,016;0,007;0,879;0,385;51,0;;;
+Penanganan imbalance;smote+threshold;0,206 ± 0,077;0,020;0,007;0,966;0,182;51,0;;;
+Feature engineering;fe;0,292 ± 0,078;0,020;0,092;0,991;0,166;61,0;;ya;ya
+Seleksi fitur;anova_k30;0,229 ± 0,099;0,025;0,029;0,997;0,090;30,0;;ya;ya
+Seleksi fitur;corr0.9;0,200 ± 0,095;0,024;0,000;0,995;0,090;51,0;;;
+Seleksi fitur;l1_C0.1;0,197 ± 0,099;0,026;-0,003;0,996;0,080;36,9;;;
+Seleksi fitur;l1_C0.03;0,186 ± 0,113;0,029;-0,014;0,997;0,071;19,7;;;
+Seleksi fitur;anova_k40;0,185 ± 0,119;0,031;-0,015;0,995;0,081;40,0;;;
+Seleksi fitur;anova_k20;0,179 ± 0,117;0,030;-0,021;0,998;0,065;20,0;;;
+Seleksi fitur;rfe_k30;0,177 ± 0,125;0,032;-0,023;0,995;0,081;30,0;;;
+Seleksi fitur;rfe_k20;0,173 ± 0,125;0,032;-0,027;0,996;0,075;20,0;;;
+Seleksi fitur;mi_k40;0,148 ± 0,131;0,034;-0,052;0,999;0,053;40,0;;;
+Seleksi fitur;anova_k10;0,114 ± 0,125;0,032;-0,086;1,000;0,031;10,0;;;
+Seleksi fitur;mi_k30;0,097 ± 0,132;0,034;-0,103;0,999;0,034;30,0;;;
+Seleksi fitur;mi_k20;0,056 ± 0,118;0,031;-0,144;1,000;0,018;20,0;;;
+Seleksi fitur;mi_k10;0,000 ± 0,000;0,000;-0,200;1,000;0,000;10,0;;;
+Seleksi fitur;l1_C0.01;0,000 ± 0,000;0,000;-0,200;1,000;0,000;7,3;;;

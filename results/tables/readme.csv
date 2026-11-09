@@ -1,0 +1,11 @@
+﻿Sheet;Isi;Sumber
+T1 Baseline;12 kandidat, semua metrik (rata-rata ± SD), hiperparameter modus, pemenang;MLflow: CKD_Baseline_v2
+T2 Screening;Tiap level komponen vs baseline, level yang dipilih (aturan 1-SE);MLflow: CKD_Stage2_v2
+T3 Kombinasi;Baseline vs komponen tunggal vs gabungan vs final, p terkoreksi;MLflow + stage2_final_config.json
+T3 Ablasi leave-one-out;Kontribusi tiap komponen dalam konfigurasi gabungan;stage2_final_config.json
+T4 Hasil uji;Metrik data uji dengan CI 95% bootstrap vs estimasi CV;final_test json + MLflow
+T4 Confusion matrix / Per kelas;Rincian prediksi data uji;final_test json
+T5 Konfigurasi final;Komponen, hiperparameter, threshold, iterasi solver;json + model final
+Metadata;Versi pustaka, commit Git, protokol (untuk reproduksibilitas);lingkungan + MLflow
+Versi '(angka)';"Kolom numerik mentah untuk analisis; versi tanpa label = teks ringkas untuk laporan";-
+Catatan;"SD = simpangan baku antar fold; SE = SD/√(jumlah fold); fold CV berulang saling berbagi data sehingga SE dan p cenderung optimistis";-

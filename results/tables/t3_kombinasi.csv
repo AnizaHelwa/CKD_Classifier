@@ -1,0 +1,5 @@
+﻿Konfigurasi;MCC (rata-rata ± SD);Selisih vs baseline;p (terkoreksi);Sensitivity;Specificity;Komponen
+Baseline;0,200 ± 0,095;0,000;;0,995;0,090;"scaler=standard; encoding=ordinal; resample=none; threshold=tidak; fe=tidak; fs=tidak ada"
+Komponen tunggal terbaik;0,302 ± 0,055;0,102;0,124;0,909;0,438;"scaler=standard; encoding=ordinal; resample=none; threshold=ya; fe=tidak; fs=tidak ada"
+Gabungan;0,354 ± 0,054;0,154;0,030;0,952;0,371;"scaler=standard; encoding=ordinal; resample=none; threshold=ya; fe=ya; fs=anova 30"
+Final (tuning akhir, CV);0,346 ± 0,043;0,146;;0,939;0,408;"scaler=standard; encoding=ordinal; resample=none; threshold=ya; fe=ya; fs=anova 30"
